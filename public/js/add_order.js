@@ -56,7 +56,7 @@ addOrderForm.addEventListener("submit", function (e) {
 addRowToTable = (data) => {
 
     // Get a reference to the current table on the page and clear it out.
-    let currentTable = document.getElementById("order-table");
+    let currentTable = document.getElementById("orders-table");
 
     // Get the location where we should insert the new row (end of table)
     let newRowIndex = currentTable.rows.length;
@@ -67,23 +67,37 @@ addRowToTable = (data) => {
 
     // Create a row and 4 cells
     let row = document.createElement("TR");
-    let idCell = document.createElement("TD");
+    let orderidCell = document.createElement("TD");
     let customerIDCell = document.createElement("TD");
     let shipmentIDCell = document.createElement("TD");
     //let orderDateCell = document.createElement("TD");
 
     // Fill the cells with correct data
-    idCell.innerText = newRow.id;
+    orderidCell.innerText = newRow.id;
     customerIDCell.innerText = newRow.customerID;
     shipmentIDCell.innerText = newRow.shipmentID;
     //orderDateCell.innerText = newRow.orderDate;
 
+    deleteCell = document.createElement("button");
+    deleteCell.innerHTML = "Delete";
+    deleteCell.onclick = function(){
+        deleteOrder(newRow.id);
+    };
+
     // Add the cells to the row 
-    row.appendChild(idCell);
+    row.appendChild(orderidCell);
     row.appendChild(customerIDCell);
     row.appendChild(shipmentIDCell);
     //row.appendChild(orderDateCell);
     
+    row.setAttribute('data-value', newRow.id);
+
     // Add the row to the table
     currentTable.appendChild(row);
+
+    let selectMenu = document.getElementById("order-select");
+    let option = document.createElement("option");
+    option.text = `${newRow.order_id} - ${newRow.customer_id} - ${newRow.shipment_id}`;
+    option.value = newRow.id;
+    selectMenu.add(option);
 }
