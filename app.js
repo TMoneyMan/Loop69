@@ -7,8 +7,10 @@ var express = require('express');
 var app = express();
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+
+
 app.use(express.static('public'))
-PORT = 45769;
+PORT = 32797;
 
 // Database
 var db = require('./database/db-connector')
@@ -89,6 +91,74 @@ app.post('/add-order', function(req, res)
     })
 
 });
+
+    // Delete an order
+
+app.delete('/delete-order', function(req, res, next) {
+    
+    let data = req.body;
+
+    let orderID = parseInt(data.id);
+    
+    let deleteOrderShip = `DELETE FROM Shipments where order_id = ?`
+    let deleteOrder = `DELETE FROM Orders WHERE order_id = ?;`;
+
+    // Run the 1st query
+    db.pool.query(deleteOrder, [orderID], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            // Run the second query
+            db.pool.query(deleteOrderShip, [orderID], function(error, rows, fields) {
+
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.sendStatus(204)
+                    location.reload('/');
+                    
+                }
+            })
+        }
+})});
+
+
+// Update an order
+app.put('/update-order', function(req, res, next) {
+    let data = req.body;
+
+    let order_id = parseInt(data.order_id);
+    let customer_id = parseInt(data.customer_id);
+    let shipment_id = parseInt(data.shipment_id);
+
+    let updateOrder = `UPDATE Orders SET customer_id = ?, shipment_id = ? WHERE order_id = ?`;
+
+    db.pool.query(updateOrder, [order_id, customer_id, shipment_id], function(error, rows, fields){
+
+        if (error) {
+
+            console.log(error);
+            res.sendStatus(400);
+
+        }
+
+        else {
+
+            res.sendStatus(204);
+            location.reload('/');
+
+                }
+            })
+        }
+    );
+
 
 /*
     LISTENER
