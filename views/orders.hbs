@@ -1,6 +1,9 @@
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
 {{!-- Create a table --}}
 <table id="orders-table">
-
+<h2>Current Orders</h2>
     {{!-- Header section --}}
     <thead>
 
@@ -25,12 +28,18 @@
             <td>{{this.customer_id}}</td>
             <td>{{this.shipment_id}}</td>
             <td>{{this.order_date}}</td>
+            <td><button onclick="deleteOrder({{this.order_id}})">Delete</button></td>
         </tr>
         {{/each}}
     </tbody>
 </table>
 
+
+
+
+
 {{!-- Form to add a record to the table  --}}
+<h2>Add New Order</h2>
 <p>To add a new order, please enter their information below and click 'Submit'!</p>
 <form id="add-order-form">
     <label for="input-customer-id">Customer ID: </label>
@@ -47,3 +56,32 @@
 
 {{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
 <script src="./js/add_order.js"></script>
+
+<script src="./js/delete_order.js"></script>
+
+
+
+<h2>Update Order</h2>
+<p>To update an order, please complete the form below and hit 'Submit'.</p>
+<form id="update-order-form-ajax">
+
+    <label for="input-order-id">Order ID: </label>
+    <select order_id="input-order-id" id="order-select">
+        <option value="test">Select an Order</option>
+        {{#each data}}
+        <option value="{{this.order_id}}">{{this.order_id}}</option>
+        {{/each}}
+    </select>
+
+    <label for="input-customer-id">Customer ID: </label>
+    <input type="number" name="input-customer-id" id="input-customer-id">
+    
+    <label for="input-shipment-id">Shipment ID: </label>
+    <input type="number" name="input-shipment-id" id="input-shipment-id">
+
+    {{!--<label for="input-order-date">Order Date: </label>
+    <input type="number" name="input-order-date" id="input-order-date">--}}
+
+    <input type="submit">
+
+    <script src="./js/update_order.js"></script>
