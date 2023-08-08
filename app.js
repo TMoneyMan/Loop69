@@ -1,65 +1,76 @@
+
 /*
     SETUP
 */
 
 // Express
-var express = require('express');
-var app = express();
+var express = require('express');   // We are using the express library for the web server
+var app = express();            // We need to instantiate an express object to interact with the server in our code
 app.use(express.json())
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: true }))
 
-
+// Static Files
 app.use(express.static('public'))
-PORT = 32797;
+
+PORT = 32797;                 // Set a port number at the top so it's easy to change in the future
 
 // Database
-var db = require('./database/db-connector')
+var db = require('./database/db-connector.js');
 
+// Handlebars
 const { engine } = require('express-handlebars');
-var exphbs = require('express-handlebars');     
-app.engine('.hbs', engine({extname: ".hbs"}));  
-app.set('view engine', '.hbs');
+var exphbs = require('express-handlebars');         // Import express-handlebars
+app.engine('.hbs', engine({ extname: ".hbs" }));    // Create an instance of the handlebars engine to process templates
+app.set('view engine', '.hbs');                     // Tell express to use handlebars engine whenever it encounters a *.hbs file.
+
+const { json } = require('express');
 
 /*
     ROUTES
 */
+// GET ROUTES
 
-app.get('/', function(req, res)
-{  
-    let query1 = "SELECT * FROM Orders;";              
+//Home Page
+app.get('/', function (req, res) {
+    res.render('index');
+});
+
+// ------------------------------------------------------------------------------------
+
+// Orders
+app.get('/orders', function (req, res) {
+    let query1 = "SELECT * FROM Orders";
 
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('orders', {data: rows});   
+        res.render('orders', {orders: rows});   
 
     })                                                      
-});      
+});     
 
-app.post('/add-order', function(req, res)
+// Add Order
+app.post('/add-order-ajax', function(req, res)
 {
-
-    let data = req.body;
-
+    let data = req.body
 
     let customer_id = parseInt(data.customerID);
     console.log(customer_id);
-    if (isNaN(customer_id)) {
+    if (customer_id === '') {
 
-        customer_id = 'NULL'
-
-        
-    }
-
-    let shipment_id = parseInt(data.shipmentID);
-    console.log(shipment_id);
-    if (isNaN(shipment_id)) {
-
-        shipment_id = 'NULL'
+        customer_id = NULL
 
     }
 
-    query1 = "INSERT INTO Orders (customer_id, shipment_id) VALUES ('${customer_id}', '${shipment_id}')";
-    db.pool.query(query1, function(error, rows, fields){
+    let shipment_id = data.shipmentID;
+    if (shipment_id === '') {
+
+        shipment_id = NULL
+
+    }
+
+    query1 = `INSERT INTO Orders (customer_id, shipment_id) VALUES (?, ?)`;
+    db.pool.query(query1, [data.customer_id, data.shipment_id],
+        function (error, fields) {
 
         if (error) {
 
@@ -92,9 +103,8 @@ app.post('/add-order', function(req, res)
 
 });
 
-    // Delete an order
-
-app.delete('/delete-order', function(req, res, next) {
+// Delete Order
+app.delete('/delete-order-ajax', function(req, res, next) {
     
     let data = req.body;
 
@@ -129,40 +139,92 @@ app.delete('/delete-order', function(req, res, next) {
         }
 })});
 
+// Update Order
 
-// Update an order
-app.put('/update-order', function(req, res, next) {
-    let data = req.body;
+//-----------------------------------------------------------------------
 
-    let order_id = parseInt(data.order_id);
-    let customer_id = parseInt(data.customer_id);
-    let shipment_id = parseInt(data.shipment_id);
+// Customers
+app.get('/customers', function (req, res) {
+    let query1 = "SELECT * FROM Customers";
 
-    let updateOrder = `UPDATE Orders SET customer_id = ?, shipment_id = ? WHERE order_id = ?`;
+    db.pool.query(query1, function(error, rows, fields){   
 
-    db.pool.query(updateOrder, [order_id, customer_id, shipment_id], function(error, rows, fields){
+        res.render('customers', {customers: rows});   
 
-        if (error) {
+    })                                                      
+});  
 
-            console.log(error);
-            res.sendStatus(400);
+// Add Customer
 
-        }
+// Update Customer
 
-        else {
+// Delete Customer
 
-            res.sendStatus(204);
-            location.reload('/');
+//-----------------------------------------------------------------------
 
-                }
-            })
-        }
-    );
+// Shipments
+app.get('/shipments', function (req, res) {
+    let query1 = "SELECT * FROM Shipments";
+
+    db.pool.query(query1, function(error, rows, fields){   
+
+        res.render('shipments', {shipments: rows});   
+
+    })                                                      
+});  
+
+// Add Shipment
+
+// Update Shipment
+
+// Delete Shipment
+
+//-----------------------------------------------------------------------
+
+// Departments
+app.get('/departments', function (req, res) {
+    let query1 = "SELECT * FROM Departments";
+
+    db.pool.query(query1, function(error, rows, fields){   
+
+        res.render('departments', {departments: rows});   
+
+    })                                                      
+});  
+
+// Add Department
+
+// Update Department
+
+// Delete Department
+
+//-----------------------------------------------------------------------
+
+// Items
+app.get('/items', function (req, res) {
+    let query1 = "SELECT * FROM Items";
+
+    db.pool.query(query1, function(error, rows, fields){   
+
+        res.render('items', {items: rows});   
+
+    })                                                      
+});  
+
+
+// Add Item
+
+// Update Item
+
+// Delete Item
+
+
+
 
 
 /*
     LISTENER
 */
-app.listen(PORT, function(){
-    console.log('Express started on http://flip2.engr.oregonstate.edu:' + PORT + '; press Ctrl-C to terminate.')
+app.listen(PORT, function () {            // This is the basic syntax for what is called the 'listener' which receives incoming requests on the specified PORT.
+    console.log('Express started on http://localhost:' + PORT + '; press Ctrl-C to terminate.')
 });
