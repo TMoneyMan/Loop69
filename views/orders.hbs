@@ -1,3 +1,8 @@
+{{!-- Source: https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main --}}
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
 
 {{!-- Create a table --}}
 <table id="orders-table">
@@ -9,11 +14,11 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each orders.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
+            <th>Order ID</th>
+            <th>Customer ID</th>
+            <th>Shipment ID</th>
+            <th>Order Date</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -37,18 +42,26 @@
 
 {{!-- Form to add a record to the table  --}}
 <h2>Add New Order</h2>
-<p>To add a new order, please enter their information below and click 'Submit'!</p>
+<p>To add a new order, please complete the form below and hit 'Submit'.</p>
+
 <form id="add-order-form-ajax">
+    <div class="form-group">
     <label for="input-customer-id">Customer ID: </label>
     <input type="number" name="input-customer-id" id="input-customer-id">
-    
+    </div>
+
+    <div class="form-group">
     <label for="input-shipment-id">Shipment ID: </label>
     <input type="number" name="input-shipment-id" id="input-shipment-id">
+    </div>
 
-    {{!--<label for="input-order-date">Order Date: </label>
-    <input type="number" name="input-order-date" id="input-order-date">--}}
+    <div class="form-group">
+    <label for="input-order-date">Order Date: </label>
+    <input type="date" name="input-order-date" id="input-order-date">
+    </div>
 
     <input type="submit">
+    
 </form>
 
 {{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
@@ -59,20 +72,25 @@
 <p>To update an order, please complete the form below and hit 'Submit'.</p>
 <form id="update-order-form-ajax">
 
+    <div class="form-group">
     <label for="input-order-id">Order ID: </label>
-    <select order_id="input-order-id" id="order-select">
+    <select order_id="input-order-id" id="order-select" class="select">
         <option value="test">Select an Order</option>
         {{#each data}}
         <option value="{{this.order_id}}">{{this.order_id}}</option>
         {{/each}}
     </select>
+    </div>
 
+    <div class="form-group">
     <label for="input-customer-id">Customer ID: </label>
     <input type="number" name="input-customer-id" id="input-customer-id">
-    
+    </div>
+
+    <div class="form-group">
     <label for="input-shipment-id">Shipment ID: </label>
     <input type="number" name="input-shipment-id" id="input-shipment-id">
-
+    </div>
 
     <input type="submit">
 
