@@ -51,26 +51,28 @@ app.get('/orders', function (req, res) {
 // Add Order
 app.post('/add-order-ajax', function(req, res)
 {
-    let data = req.body
+    let data = req.body;
 
-    let customer_id = parseInt(data.customerID);
-    console.log(customer_id);
-    if (customer_id === '') {
-
-        customer_id = NULL
-
+    let customer_id = parseInt(data.customer_id);
+    if (isNaN(customer_id))
+    {
+        customer_id = 'NULL'
     }
 
-    let shipment_id = data.shipmentID;
-    if (shipment_id === '') {
-
-        shipment_id = NULL
-
+    let shipment_id = data.shipment_id;
+    if (isNaN(shipment_id))
+    {
+        shipment_id = "NULL"
     }
 
-    query1 = `INSERT INTO Orders (customer_id, shipment_id) VALUES (?, ?)`;
-    db.pool.query(query1, [data.customer_id, data.shipment_id],
-        function (error, fields) {
+    let order_date = data.order_date;
+    if (isNaN(order_date))
+    {
+        order_date = "NULL"
+    }
+
+    query1 = `INSERT INTO Orders (customer_id, shipment_id, order_date) VALUES ('${data.customer_id}', '${data.shipment_id}', '${data.order_date}}')`;
+    db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
 
@@ -102,6 +104,10 @@ app.post('/add-order-ajax', function(req, res)
     })
 
 });
+
+
+// Search for an Order, view OrderItems (contents in Order)
+
 
 // Delete Order
 app.delete('/delete-order-ajax', function(req, res, next) {
@@ -154,6 +160,8 @@ app.get('/customers', function (req, res) {
     })                                                      
 });  
 
+// Search for Customers, view their orders
+
 // Add Customer
 
 // Update Customer
@@ -173,6 +181,8 @@ app.get('/shipments', function (req, res) {
     })                                                      
 });  
 
+// find a shipment by searching for its order_id
+
 // Add Shipment
 
 // Update Shipment
@@ -191,6 +201,8 @@ app.get('/departments', function (req, res) {
 
     })                                                      
 });  
+
+// search departments for a specific item
 
 // Add Department
 
@@ -213,14 +225,70 @@ app.get('/items', function (req, res) {
 
 
 // Add Item
+app.post('/add-item-ajax', function(req, res)
+{
+    let data = req.body
+
+    let item_quantity = parseInt(data.itemQuantity);
+    console.log(item_quantity);
+    if (item_quantity === '') {
+
+        item_quantity = NULL
+
+    }
+
+    query1 = `INSERT INTO Items (item_name, item_price, item_quantity, department_id) VALUES (?, ?, ?, ?)`;
+    db.pool.query(query1, [data.item_name, data.item_price, data.item_quantity, data.department_id],
+        function (error, fields) {
+
+        if (error) {
+
+            console.log(error)
+            res.sendStatus(400);
+
+        }
+        else {
+
+            query2 = `SELECT * FROM Items;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    console.log(error);
+                    res.sendStatus(400);
+
+                }
+                else {
+                    res.send(rows);
+                }
+
+            })
+
+        }
+
+
+    })
+
+});
 
 // Update Item
 
 // Delete Item
 
 
+//-----------------------------------------------------------------------
+
+// Order Items
+
+// Add to OrderItems when Order is created
+
+// When order is updated, add to OrderItems
+
+// When order is deleted, remove OrderItems entry
 
 
+// -----------------------------------------------------------------------
 
 /*
     LISTENER
