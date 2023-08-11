@@ -1,8 +1,7 @@
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
 
 {{!-- Create a table --}}
 <table id="orders-table">
+
 <h2>Current Orders</h2>
     {{!-- Header section --}}
     <thead>
@@ -10,7 +9,7 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each data.[0]}}
+            {{#each orders.[0]}}
             <th>
                 {{@key}}
             </th>
@@ -22,7 +21,7 @@
     <tbody>
 
 
-        {{#each data}}
+        {{#each orders}}
         <tr>
             <td>{{this.order_id}}</td>
             <td>{{this.customer_id}}</td>
@@ -33,15 +32,13 @@
         {{/each}}
     </tbody>
 </table>
-
-
-
+<script src="./js/delete_order.js"></script>
 
 
 {{!-- Form to add a record to the table  --}}
 <h2>Add New Order</h2>
 <p>To add a new order, please enter their information below and click 'Submit'!</p>
-<form id="add-order-form">
+<form id="add-order-form-ajax">
     <label for="input-customer-id">Customer ID: </label>
     <input type="number" name="input-customer-id" id="input-customer-id">
     
@@ -56,9 +53,6 @@
 
 {{!-- Embed our javascript to handle the DOM manipulation and AJAX request --}}
 <script src="./js/add_order.js"></script>
-
-<script src="./js/delete_order.js"></script>
-
 
 
 <h2>Update Order</h2>
@@ -79,8 +73,6 @@
     <label for="input-shipment-id">Shipment ID: </label>
     <input type="number" name="input-shipment-id" id="input-shipment-id">
 
-    {{!--<label for="input-order-date">Order Date: </label>
-    <input type="number" name="input-order-date" id="input-order-date">--}}
 
     <input type="submit">
 

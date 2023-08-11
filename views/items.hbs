@@ -1,14 +1,14 @@
 
 {{!-- Create a table --}}
-<table id="customers-table">
-<h2>Current Customers</h2>
+<table id="items-table">
+<h2>Available Items</h2>
     {{!-- Header section --}}
     <thead>
 
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each customers.[0]}}
+            {{#each items.[0]}}
             <th>
                 {{@key}}
             </th>
@@ -20,13 +20,14 @@
     <tbody>
 
 
-        {{#each customers}}
+        {{#each items}}
         <tr>
-            <td>{{this.customer_id}}</td>
-            <td>{{this.first_name}}</td>
-            <td>{{this.last_name}}</td>
-            <td>{{this.email}}</td>
-            <td><button onclick="deleteCustomer({{this.customer_id}})">Delete</button></td>
+            <td>{{this.item_id}}</td>
+            <td>{{this.item_name}}</td>
+            <td>{{this.item_price}}</td>
+            <td>{{this.item_quantity}}</td>
+            <td>{{this.department_id}}</td>
+            <td><button onclick="deleteItem({{this.item_id}})">Delete</button></td>
         </tr>
         {{/each}}
     </tbody>
