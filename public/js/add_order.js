@@ -1,5 +1,5 @@
 // Get the objects we need to modify
-let addOrderForm = document.getElementById('add-order-form');
+let addOrderForm = document.getElementById('add-order-form-ajax');
 
 // Modify the objects we need
 addOrderForm.addEventListener("submit", function (e) {
