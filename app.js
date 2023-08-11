@@ -49,27 +49,9 @@ app.get('/orders', function (req, res) {
 });     
 
 // Add Order
-app.post('/add-order-ajax', function(req, res)
+app.post('/add-order', function(req, res)
 {
     let data = req.body;
-
-    let customer_id = parseInt(data.customer_id);
-    if (isNaN(customer_id))
-    {
-        customer_id = 'NULL'
-    }
-
-    let shipment_id = data.shipment_id;
-    if (isNaN(shipment_id))
-    {
-        shipment_id = "NULL"
-    }
-
-    let order_date = data.order_date;
-    if (isNaN(order_date))
-    {
-        order_date = "NULL"
-    }
 
     query1 = `INSERT INTO Orders (customer_id, shipment_id, order_date) VALUES ('${data.customer_id}', '${data.shipment_id}', '${data.order_date}}')`;
     db.pool.query(query1, function (error, rows, fields) {
