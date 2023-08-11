@@ -10,18 +10,18 @@ addOrderForm.addEventListener("submit", function (e) {
     // Get form fields we need to get data from
     let inputCustomerID = document.getElementById("input-customer-id");
     let inputShipmentID = document.getElementById("input-shipment-id");
-    //let inputOrderDate = document.getElementById("input-order-date");
+    let inputOrderDate = document.getElementById("input-order-date");
 
     // Get the values from the form fields
     let customerIDValue = inputCustomerID.value;
     let shipmentIDValue = inputShipmentID.value;
-    //let orderDateValue = inputOrderDate.value;
+    let orderDateValue = inputOrderDate.value;
 
     // Put our data we want to send in a javascript object
     let data = {
         customerID: customerIDValue,
         shipmentID: shipmentIDValue,
-        //orderDate: orderDateValue,
+        orderDate: orderDateValue,
     }
     
     // Setup our AJAX request
@@ -39,7 +39,7 @@ addOrderForm.addEventListener("submit", function (e) {
             // Clear the input fields for another transaction
             inputCustomerID.value = '';
             inputShipmentID.value = '';
-            //inputOrderDate.value = '';
+            inputOrderDate.value = '';
         }
         else if (xhttp.readyState == 4 && xhttp.status != 200) {
             console.log("There was an error with the input.")
@@ -70,13 +70,13 @@ addRowToTable = (data) => {
     let orderidCell = document.createElement("TD");
     let customerIDCell = document.createElement("TD");
     let shipmentIDCell = document.createElement("TD");
-    //let orderDateCell = document.createElement("TD");
+    let orderDateCell = document.createElement("TD");
 
     // Fill the cells with correct data
     orderidCell.innerText = newRow.id;
     customerIDCell.innerText = newRow.customerID;
     shipmentIDCell.innerText = newRow.shipmentID;
-    //orderDateCell.innerText = newRow.orderDate;
+    orderDateCell.innerText = newRow.orderDate;
 
     deleteCell = document.createElement("button");
     deleteCell.innerHTML = "Delete";
@@ -88,7 +88,7 @@ addRowToTable = (data) => {
     row.appendChild(orderidCell);
     row.appendChild(customerIDCell);
     row.appendChild(shipmentIDCell);
-    //row.appendChild(orderDateCell);
+    row.appendChild(orderDateCell);
     
     row.setAttribute('data-value', newRow.id);
 
@@ -97,7 +97,7 @@ addRowToTable = (data) => {
 
     let selectMenu = document.getElementById("order-select");
     let option = document.createElement("option");
-    option.text = `${newRow.order_id} - ${newRow.customer_id} - ${newRow.shipment_id}`;
+    option.text = `${newRow.order_id} - ${newRow.customer_id} - ${newRow.shipment_id} - ${newRow.order_date}`;
     option.value = newRow.id;
     selectMenu.add(option);
 }
