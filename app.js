@@ -41,6 +41,8 @@ app.get('/', function (req, res) {
 app.get('/orders', function (req, res) {
     let query1 = "SELECT * FROM Orders";
 
+    let query2 = "SELECT * FROM Customers"
+
     db.pool.query(query1, function(error, rows, fields){   
 
         res.render('orders', {orders: rows});   
@@ -53,7 +55,7 @@ app.post('/add-order', function(req, res)
 {
     let data = req.body;
 
-    query1 = `INSERT INTO Orders (customer_id, shipment_id, order_date) VALUES ('${data.customerID}', '${data.shipmentID}', '${data.orderDate}}')`;
+    query1 = `INSERT INTO Orders (customer_id, order_date) VALUES ('${data.customerID}', '${data.orderDate}}')`;
     db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
@@ -92,7 +94,7 @@ app.post('/add-order', function(req, res)
 
 
 // Delete Order
-app.delete('/delete-order-ajax', function(req, res, next) {
+app.delete('/delete-order', function(req, res, next) {
     
     let data = req.body;
 
@@ -119,8 +121,7 @@ app.delete('/delete-order-ajax', function(req, res, next) {
                     console.log(error);
                     res.sendStatus(400);
                 } else {
-                    res.sendStatus(204)
-                    location.reload('/');
+                    res.sendStatus(204);
                     
                 }
             })
@@ -145,10 +146,81 @@ app.get('/customers', function (req, res) {
 // Search for Customers, view their orders
 
 // Add Customer
+app.post('/add-customer', function (req, res) {
+
+    let data = req.body;
+
+    query1 = `INSERT INTO Customers (first_name, last_name, email) VALUES ('${data.fname}', '${data.lname}', '${data.email}')`;
+    db.pool.query(query1, function (error, rows, fields) {
+
+        if (error) {
+
+            console.log(error);
+            res.sendStatus(400);
+
+        }
+        else {
+
+            query2 = `SELECT * FROM Customers;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    console.log(error);
+                    res.sendStatus(400);
+
+                }
+                else {
+                    res.send(rows);
+                }
+
+            })
+
+        }
+
+
+    })
+
+});
+
 
 // Update Customer
 
 // Delete Customer
+app.delete('/delete-customer', function(req, res, next) {
+    
+    let data = req.body;
+
+    let customerID = parseInt(data.customer_id);
+    
+    let query1 = `DELETE FROM Customers WHERE customer_id = ?`;
+    let query2 = `DELETE FROM Orders WHERE customer_id = ?`
+
+
+    db.pool.query(query2, [customerID], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            // Run the second query
+            db.pool.query(query1, [customerID], function(error, rows, fields) {
+
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.sendStatus(204);
+                }
+            })
+        }
+})});
+
 
 //-----------------------------------------------------------------------
 
