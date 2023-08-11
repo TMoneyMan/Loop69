@@ -8,11 +8,10 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each departments.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
+            <th>Department ID</th>
+            <th>Department Name</th>
+            <th>Item Amt</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
@@ -24,7 +23,7 @@
         <tr>
             <td>{{this.department_id}}</td>
             <td>{{this.department_name}}</td>
-            <td>{{this.department_quantity}}</td>
+            <td>{{this.dept_quantity}}</td>
             <td><button onclick="deleteDepartment({{this.department_id}})">Delete</button></td>
         </tr>
         {{/each}}

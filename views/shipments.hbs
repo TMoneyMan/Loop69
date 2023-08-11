@@ -9,11 +9,11 @@
         {{!-- For just the first row, we print each key of the row object as a header cell so we
         know what each column means when the page renders --}}
         <tr>
-            {{#each shipments.[0]}}
-            <th>
-                {{@key}}
-            </th>
-            {{/each}}
+            <th>Shipment ID</th>
+            <th>Order ID</th>
+            <th>Shipment Date</th>
+            <th>Shipment Status</th>
+            <th>Actions</th>
         </tr>
     </thead>
 
