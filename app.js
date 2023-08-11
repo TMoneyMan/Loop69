@@ -53,7 +53,7 @@ app.post('/add-order', function(req, res)
 {
     let data = req.body;
 
-    query1 = `INSERT INTO Orders (customer_id, shipment_id, order_date) VALUES ('${data.customer_id}', '${data.shipment_id}', '${data.order_date}}')`;
+    query1 = `INSERT INTO Orders (customer_id, shipment_id, order_date) VALUES ('${data.customerID}', '${data.shipmentID}', '${data.orderDate}}')`;
     db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
