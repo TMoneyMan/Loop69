@@ -1,0 +1,75 @@
+
+{{!-- Create a table --}}
+<table id="orderitems-table">
+<h2>Order Items</h2>
+    {{!-- Header section --}}
+    <thead>
+
+        {{!-- For just the first row, we print each key of the row object as a header cell so we
+        know what each column means when the page renders --}}
+        <tr>
+            <th>Order Item ID</th>
+            <th>Order ID</th>
+            <th>Item ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    {{!-- Body section --}}
+    <tbody>
+
+
+        {{#each orderitems}}
+        <tr>
+            <td>{{this.order_item_id}}</td>
+            <td>{{this.order_id}}</td>
+            <td>{{this.item_id}}</td>
+            <td><button onclick="deleteOrderItem({{this.order_item_id}})">Delete</button></td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<script src="./js/delete_orderitems.js"></script>
+
+<h2>Add Order Item</h2>
+<p>To add a new Order Item, please complete the form below and hit 'Submit'.</p>
+
+<form id="add-orderitem-form">
+
+    <div class="form-group">
+    <label for="input-order-id">Order ID: </label>
+    <input type="text" name="input-order-id" id="input-order-id">
+    </div>
+
+    <div class="form-group">
+    <label for="input-item-id">Item ID: </label>
+    <input type="number" name="input-item-id" id="input-item-id">
+    </div>
+
+    <input type="submit">
+</form>
+
+<script src="./js/add_orderitem.js"></script>
+
+{{!-- <h2>Updating A Order Item</h2>
+<p>To update a specific Order Item select their order id from the drop-down menu on the left and item id on the right</p>
+<form id="update-orderitem-form">
+
+    <label for="input-deptName">Department name: </label>
+    <select name="input-deptName" id="input-deptName-update">
+        <option value="test">Select a Department</option>
+        {{#each data}}
+        <option value="{{this.id}}">{{this.orderitem_name}}</option>
+        {{/each}}
+    </select>
+
+    <div class="form-group">
+    <label for="input-deptAmount-update">Item Amount: </label>
+    <input type="number" name="input-deptAmount-update" id="input-deptAmount-update">
+    </div>
+
+    <input type="submit">
+
+</form>
+
+<script src="./js/update_orderitem.js"></script> --}}

@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }))
 // Static Files
 app.use(express.static('public'))
 
-PORT = 32797;                 // Set a port number at the top so it's easy to change in the future
+PORT = 32796;                 // Set a port number at the top so it's easy to change in the future
 
 // Database
 var db = require('./database/db-connector.js');
@@ -53,7 +53,7 @@ app.post('/add-order', function(req, res)
 {
     let data = req.body;
 
-    query1 = `INSERT INTO Orders (customer_id, shipment_id, order_date) VALUES ('${data.customerID}', '${data.shipmentID}', '${data.orderDate}}')`;
+    query1 = `INSERT INTO Shipments (shipment_date, shipment_status) VALUES ('${data.orderDate}}', '${false}}')`
     db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
@@ -64,27 +64,45 @@ app.post('/add-order', function(req, res)
         }
         else {
 
-            query2 = `SELECT * FROM Orders;`;
-            db.pool.query(query2, function(error, rows, fields){
+            const nextShipmentID = db.pool.query('SELECT * FROM Shipments ORDER BY shipment_id DESC LIMIT 1')
 
-                // If there was an error on the second query, send a 400
+            query2 = `INSERT INTO Orders (customer_id, shipment_id, order_date) SELECT '${data.customerID}', '${shipment_id}' , '${data.orderDate}}' from Shipments ORDER BY shipment_id DESC LIMIT 1`;
+            db.pool.query(query2, function (error, rows, fields) {
+        
                 if (error) {
-                    
-                    console.log(error);
+        
+                    console.log(error)
                     res.sendStatus(400);
-
+        
                 }
                 else {
-                    res.send(rows);
+        
+                    query3 = `SELECT * FROM Orders;`;
+                    db.pool.query(query3, function(error, rows, fields){
+        
+                        // If there was an error on the second query, send a 400
+                        if (error) {
+                            
+                            console.log(error);
+                            res.sendStatus(400);
+        
+                        }
+                        else {
+                            res.send(rows);
+                        }
+        
+                    })
+        
                 }
-
+        
+        
             })
 
         }
 
-
     })
 
+   
 });
 
 
@@ -187,10 +205,80 @@ app.get('/departments', function (req, res) {
 // search departments for a specific item
 
 // Add Department
+app.post('/add-department', function (req, res) {
+
+    let data = req.body;
+
+    query1 = `INSERT INTO Departments (department_name, dept_quantity) VALUES ('${data.dName}', '${data.dQuant}')`;
+    db.pool.query(query1, function (error, rows, fields) {
+
+        if (error) {
+
+            console.log(error);
+            res.sendStatus(400);
+
+        }
+        else {
+
+            query2 = `SELECT * FROM Departments;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+
+                    console.log(error);
+                    res.sendStatus(400);
+
+                }
+                else {
+                    res.send(rows);
+                }
+
+            })
+
+        }
+
+
+    })
+
+});
 
 // Update Department
 
+
 // Delete Department
+app.delete('/delete-department', function(req, res, next) {
+
+    let data = req.body;
+
+    let departmentID = parseInt(data.department_id);
+
+    let query1 = `DELETE FROM Departments WHERE department_id = ?`;
+    let query2 = `DELETE FROM Items WHERE department_id = ?`
+
+
+    db.pool.query(query2, [departmentID], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            // Run the second query
+            db.pool.query(query1, [departmentID], function(error, rows, fields) {
+
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.sendStatus(204);
+                }
+            })
+        }
+})});
 
 //-----------------------------------------------------------------------
 
@@ -269,6 +357,62 @@ app.post('/add-item-ajax', function(req, res)
 
 // When order is deleted, remove OrderItems entry
 
+
+// -----------------------------------------------------------------------
+
+// OrderItems
+app.get('/orderitems', function (req, res) {
+    let query1 = "SELECT * FROM OrderItems";
+
+    db.pool.query(query1, function(error, rows, fields){   
+
+        res.render('orderitems', {orders: rows});   
+
+    })                                                      
+}); 
+
+// Add OrderItems
+app.post('/add-orderitem', function (req, res) {
+
+    let data = req.body;
+
+    query1 = `INSERT INTO OrderItems (order_id, item_id) VALUES ('${data.orderID}', '${data.itemID}')`;
+    db.pool.query(query1, function (error, rows, fields) {
+
+        if (error) {
+
+            console.log(error);
+            res.sendStatus(400);
+
+        }
+        else {
+
+            query2 = `SELECT * FROM OrderItems;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+
+                    console.log(error);
+                    res.sendStatus(400);
+
+                }
+                else {
+                    res.send(rows);
+                }
+
+            })
+
+        }
+
+
+    })
+
+});
+
+// Update OrderItems
+
+// Delete OrderItems
 
 // -----------------------------------------------------------------------
 

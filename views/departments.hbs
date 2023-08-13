@@ -29,3 +29,47 @@
         {{/each}}
     </tbody>
 </table>
+<script src="./js/delete_department.js"></script>
+
+<h2>Add Department</h2>
+<p>To add a new Department, please complete the form below and hit 'Submit'.</p>
+
+<form id="add-department-form">
+
+    <div class="form-group">
+    <label for="input-department-name">Department Name: </label>
+    <input type="text" name="input-department-name" id="input-department-name">
+    </div>
+
+    <div class="form-group">
+    <label for="input-department-amount">Item Amount: </label>
+    <input type="number" name="input-department-amount" id="input-department-amount">
+    </div>
+
+    <input type="submit">
+</form>
+
+<script src="./js/add_department.js"></script>
+
+<h2>Updating A Department</h2>
+<p>To update a specific Department select their name from the drop-down menu on the left and enter quantity</p>
+<form id="update-department-form">
+
+    <label for="input-deptName">Department name: </label>
+    <select name="input-deptName" id="input-deptName-update">
+        <option value="test">Select a Department</option>
+        {{#each data}}
+        <option value="{{this.id}}">{{this.department_name}}</option>
+        {{/each}}
+    </select>
+
+    <div class="form-group">
+    <label for="input-deptAmount-update">Item Amount: </label>
+    <input type="number" name="input-deptAmount-update" id="input-deptAmount-update">
+    </div>
+
+    <input type="submit">
+
+</form>
+
+<script src="./js/update_department.js"></script>
