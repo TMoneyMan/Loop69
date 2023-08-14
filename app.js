@@ -41,21 +41,31 @@ app.get('/', function (req, res) {
 app.get('/orders', function (req, res) {
     let query1 = "SELECT * FROM Orders";
 
+    // Dropdown
     let query2 = "SELECT * FROM Customers"
 
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('orders', {orders: rows});   
+        let orders = rows;
 
+        db.pool.query(query2, function(error, rows, fields){
+            let customers = rows;
+            return res.render('orders', {orders: orders, customers: customers});
+        })
     })                                                      
 });     
 
 // Add Order
-app.post('/add-order', function(req, res)
-{
+app.post('/add-order', function(req, res) {
     let data = req.body;
 
+    const customer_id = data.customerID
+    const order_date = data.orderDate
+
     query1 = `INSERT INTO Orders (customer_id, order_date) VALUES ('${data.customerID}', '${data.orderDate}}')`;
+    query2 = `SELECT LAST_INSERT_ID() AS shipment_id`;
+    query3 = `INSERT INTO Shipments (shipment_id, order_id, shipment_date, shipment_status) VALUES (@shipment_id, @order_id, '${data.orderDate}', 'Shipped')`;
+
     db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
@@ -66,7 +76,6 @@ app.post('/add-order', function(req, res)
         }
         else {
 
-            query2 = `SELECT * FROM Orders;`;
             db.pool.query(query2, function(error, rows, fields){
 
                 // If there was an error on the second query, send a 400
@@ -77,15 +86,28 @@ app.post('/add-order', function(req, res)
 
                 }
                 else {
-                    res.send(rows);
+
+                    db.pool.query(query3, function(error, rows, fields) {
+
+                        if (error) {
+                    
+                            console.log(error);
+                            res.sendStatus(400);
+        
+                        }
+                        else {
+                                    
+                                    res.send(rows);
                 }
-
+            
             })
-
+                
         }
-
+            
 
     })
+
+}})
 
 });
 
@@ -186,6 +208,42 @@ app.post('/add-customer', function (req, res) {
 
 
 // Update Customer
+app.put('/put-customer-ajax', function(req,res,next){
+    let data = req.body;
+  
+    let customer_id = parseInt(data.customer_id);
+    let email = data.email;
+  
+    let selectCustomers = `SELECT * FROM Customers WHERE customer_id = ?`
+    let queryUpdateCustomer = `UPDATE Customers SET email = ? WHERE Customers.customer_id = ?`;
+    
+  
+          // Run the 1st query
+          db.pool.query(selectCustomers, [customer_id], function(error, rows, fields){
+              if (error) {
+  
+              // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+              console.log(error);
+              res.sendStatus(400);
+              }
+  
+              // If there was no error, we run our second query and return that data so we can use it to update the people's
+              // table on the front-end
+              else
+              {
+                  // Run the second query
+                  db.pool.query(queryUpdateCustomer, [customer_id, email], function(error, rows, fields) {
+  
+                      if (error) {
+                          console.log(error);
+                          res.sendStatus(400);
+                      } else {
+                          res.send(rows);
+                      }
+                  })
+              }
+  })});
+
 
 // Delete Customer
 app.delete('/delete-customer', function(req, res, next) {
@@ -228,16 +286,59 @@ app.delete('/delete-customer', function(req, res, next) {
 app.get('/shipments', function (req, res) {
     let query1 = "SELECT * FROM Shipments";
 
+    // Dropdown
+    let query2 = "SELECT * from Orders";
+
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('shipments', {shipments: rows});   
+        let shipments = rows;
+
+        db.pool.query(query2, function(error, rows, fields){
+            let orders = rows;
+            return res.render('shipments', {shipments: shipments, orders: orders});
+        })
 
     })                                                      
 });  
 
-// find a shipment by searching for its order_id
-
 // Add Shipment
+app.post('/add-shipment', function (req, res) {
+
+    let data = req.body;
+
+    query1 = `INSERT INTO Shipments (order_id, shipment_date, shipment_status) VALUES ('${data.orderID}', '${data.shipmentDate}', '${data.shipmentStatus}')`;
+    db.pool.query(query1, function (error, rows, fields) {
+
+        if (error) {
+
+            console.log(error);
+            res.sendStatus(400);
+
+        }
+        else {
+
+            query2 = `SELECT * FROM Shipments;`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    console.log(error);
+                    res.sendStatus(400);
+
+                }
+                else {
+                    res.send(rows);
+                }
+
+            })
+
+        }
+
+
+    })
+
+});
 
 // Update Shipment
 
@@ -279,21 +380,12 @@ app.get('/items', function (req, res) {
 
 
 // Add Item
-app.post('/add-item-ajax', function(req, res)
+app.post('/add-item', function(req, res)
 {
     let data = req.body
 
-    let item_quantity = parseInt(data.itemQuantity);
-    console.log(item_quantity);
-    if (item_quantity === '') {
-
-        item_quantity = NULL
-
-    }
-
-    query1 = `INSERT INTO Items (item_name, item_price, item_quantity, department_id) VALUES (?, ?, ?, ?)`;
-    db.pool.query(query1, [data.item_name, data.item_price, data.item_quantity, data.department_id],
-        function (error, fields) {
+    query1 = `INSERT INTO Items (item_name, item_price, item_quantity, department_id) VALUES ('${data.itemName}', '${data.itemPrice}', '${data.itemQuantity}', '${data.deptID}')`;
+    db.pool.query(query1, function (error, fields) {
 
         if (error) {
 
@@ -325,6 +417,7 @@ app.post('/add-item-ajax', function(req, res)
     })
 
 });
+
 
 // Update Item
 
