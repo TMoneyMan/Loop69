@@ -1,4 +1,4 @@
-https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%205%20-%20Adding%20New%20Data
+// https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%205%20-%20Adding%20New%20Data
 
 let addItemForm = document.getElementById('add-item-form-ajax');
 
@@ -12,7 +12,7 @@ addItemForm.addEventListener("submit", function (e) {
     let inputItemName = document.getElementById("input-item-name");
     let inputItemPrice = document.getElementById("input-item-price");
     let inputItemQuantity = document.getElementById("input-item-quantity")
-    let itemDept = document.getElementById("input-item-dept")
+    let itemDept = document.getElementById("select-item-dept")
 
     // Get the values from the form fields
     let itemNameValue = inputItemName.value;
@@ -89,7 +89,7 @@ addRowToTable = (data) => {
     deleteCell = document.createElement("button");
     deleteCell.innerHTML = "Delete";
     deleteCell.onclick = function(){
-        deleteOrder(newRow.id);
+        deleteItem(newRow.item_id);
     };
 
     // Add the cells to the row 
@@ -98,10 +98,12 @@ addRowToTable = (data) => {
     row.appendChild(itemPriceCell);
     row.appendChild(itemQuantityCell);
     row.appendChild(deptIDCell);
+    row.appendChild(deleteCell)
 
     // Add a row attribute so the deleteRow function can find a newly added row
     row.setAttribute('data-value', newRow.item_id)
     
     // Add the row to the table
     currentTable.appendChild(row);
+
 }
