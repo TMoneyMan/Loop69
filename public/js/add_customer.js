@@ -1,3 +1,5 @@
+https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%205%20-%20Adding%20New%20Data
+
 // Get the objects we need to modify
 let addCustomerForm = document.getElementById('add-customer-form-ajax');
 
@@ -71,6 +73,7 @@ addRowToTable = (data) => {
     let fNameCell = document.createElement("TD");
     let lNameCell = document.createElement("TD");
     let emailCell = document.createElement("TD");
+    let deleteCell = document.createElement("TD");
 
     // Fill the cells with correct data
     customerIDCell.innerText = newRow.customer_id;
@@ -81,7 +84,7 @@ addRowToTable = (data) => {
     deleteCell = document.createElement("button");
     deleteCell.innerHTML = "Delete";
     deleteCell.onclick = function(){
-        deleteOrder(newRow.id);
+        deleteOrder(newRow.customer_id);
     };
 
     // Add the cells to the row 
@@ -89,6 +92,7 @@ addRowToTable = (data) => {
     row.appendChild(fNameCell);
     row.appendChild(lNameCell);
     row.appendChild(emailCell);
+    row.appendChild(deleteCell);
     
     row.setAttribute('data-value', newRow.customer_id);
 
@@ -97,7 +101,7 @@ addRowToTable = (data) => {
 
     let selectMenu = document.getElementById("customer-select");
     let option = document.createElement("option");
-    option.text = `${newRow.customer_id} - ${newRow.first_name} - ${newRow.last_name} - ${newRow.email}`;
+    option.text = newRow.first_name + ' ' + newRow.last_name;
     option.value = newRow.customer_id;
     selectMenu.add(option);
 }

@@ -1,4 +1,3 @@
-
 /*
     SETUP
 */
@@ -12,7 +11,7 @@ app.use(express.urlencoded({ extended: true }))
 // Static Files
 app.use(express.static('public'))
 
-PORT = 32796;                 // Set a port number at the top so it's easy to change in the future
+PORT = 32797;                 // Set a port number at the top so it's easy to change in the future
 
 // Database
 var db = require('./database/db-connector.js');
@@ -41,25 +40,31 @@ app.get('/', function (req, res) {
 app.get('/orders', function (req, res) {
     let query1 = "SELECT * FROM Orders";
 
+    // Dropdown
     let query2 = "SELECT * FROM Customers"
 
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('orders', {orders: rows});   
+        let orders = rows;
 
+        db.pool.query(query2, function(error, rows, fields){
+            let customers = rows;
+            return res.render('orders', {orders: orders, customers: customers});
+        })
     })                                                      
 });     
 
 // Add Order
-app.post('/add-order', function(req, res)
-{
+app.post('/add-order', function(req, res) {
     let data = req.body;
 
-<<<<<<< HEAD
-    query1 = `INSERT INTO Shipments (shipment_date, shipment_status) VALUES ('${data.orderDate}}', '${false}}')`
-=======
+    const customer_id = data.customerID
+    const order_date = data.orderDate
+
     query1 = `INSERT INTO Orders (customer_id, order_date) VALUES ('${data.customerID}', '${data.orderDate}}')`;
->>>>>>> 2405a5b1f13bc840b4841da2fb7dad6ccca0afb7
+    query2 = `SELECT LAST_INSERT_ID() AS shipment_id`;
+    query3 = `INSERT INTO Shipments (shipment_id, order_id, shipment_date, shipment_status) VALUES (@shipment_id, @order_id, '${data.orderDate}', 'Shipped')`;
+
     db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
@@ -70,45 +75,39 @@ app.post('/add-order', function(req, res)
         }
         else {
 
-            const nextShipmentID = db.pool.query('SELECT * FROM Shipments ORDER BY shipment_id DESC LIMIT 1')
+            db.pool.query(query2, function(error, rows, fields){
 
-            query2 = `INSERT INTO Orders (customer_id, shipment_id, order_date) SELECT '${data.customerID}', '${shipment_id}' , '${data.orderDate}}' from Shipments ORDER BY shipment_id DESC LIMIT 1`;
-            db.pool.query(query2, function (error, rows, fields) {
-        
+                // If there was an error on the second query, send a 400
                 if (error) {
-        
-                    console.log(error)
+                    
+                    console.log(error);
                     res.sendStatus(400);
-        
+
                 }
                 else {
-        
-                    query3 = `SELECT * FROM Orders;`;
-                    db.pool.query(query3, function(error, rows, fields){
-        
-                        // If there was an error on the second query, send a 400
+
+                    db.pool.query(query3, function(error, rows, fields) {
+
                         if (error) {
-                            
+                    
                             console.log(error);
                             res.sendStatus(400);
         
                         }
                         else {
-                            res.send(rows);
-                        }
-        
-                    })
-        
+                                    
+                                    res.send(rows);
                 }
-        
-        
+            
             })
-
+                
         }
+            
 
     })
 
-   
+}})
+
 });
 
 
@@ -208,6 +207,42 @@ app.post('/add-customer', function (req, res) {
 
 
 // Update Customer
+app.put('/put-customer-ajax', function(req,res,next){
+    let data = req.body;
+  
+    let customer_id = parseInt(data.customer_id);
+    let email = data.email;
+  
+    let selectCustomers = `SELECT * FROM Customers WHERE customer_id = ?`
+    let queryUpdateCustomer = `UPDATE Customers SET email = ? WHERE Customers.customer_id = ?`;
+    
+  
+          // Run the 1st query
+          db.pool.query(selectCustomers, [customer_id], function(error, rows, fields){
+              if (error) {
+  
+              // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+              console.log(error);
+              res.sendStatus(400);
+              }
+  
+              // If there was no error, we run our second query and return that data so we can use it to update the people's
+              // table on the front-end
+              else
+              {
+                  // Run the second query
+                  db.pool.query(queryUpdateCustomer, [customer_id, email], function(error, rows, fields) {
+  
+                      if (error) {
+                          console.log(error);
+                          res.sendStatus(400);
+                      } else {
+                          res.send(rows);
+                      }
+                  })
+              }
+  })});
+
 
 // Delete Customer
 app.delete('/delete-customer', function(req, res, next) {
@@ -215,6 +250,11 @@ app.delete('/delete-customer', function(req, res, next) {
     let data = req.body;
 
     let customerID = parseInt(data.customer_id);
+    if (isNaN(customer_id))
+    {
+        customer_id = 'NULL'
+    }
+
     
     let query1 = `DELETE FROM Customers WHERE customer_id = ?`;
     let query2 = `DELETE FROM Orders WHERE customer_id = ?`
@@ -250,20 +290,101 @@ app.delete('/delete-customer', function(req, res, next) {
 app.get('/shipments', function (req, res) {
     let query1 = "SELECT * FROM Shipments";
 
+    // Dropdown
+    let query2 = "SELECT * from Orders";
+
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('shipments', {shipments: rows});   
+        let shipments = rows;
+
+        db.pool.query(query2, function(error, rows, fields){
+            let orders = rows;
+            return res.render('shipments', {shipments: shipments, orders: orders});
+        })
 
     })                                                      
 });  
 
-// find a shipment by searching for its order_id
-
 // Add Shipment
+app.post('/add-shipment', function (req, res) {
+
+    let data = req.body;
+
+    let shipment_status = parseInt(data.shipment_status);
+    if (isNaN(shipment_status))
+    {
+        shipment_status = 'NULL'
+    }
+
+    query1 = `INSERT INTO Shipments (order_id, shipment_date, shipment_status) VALUES ('${data.orderID}', '${data.shipmentDate}', '${data.shipmentStatus}')`;
+    db.pool.query(query1, function (error, rows, fields) {
+
+        if (error) {
+
+            console.log(error);
+            res.sendStatus(400);
+
+        }
+        else {
+
+            query2 = `SELECT * FROM Shipments`;
+            db.pool.query(query2, function(error, rows, fields){
+
+                // If there was an error on the second query, send a 400
+                if (error) {
+                    
+                    console.log(error);
+                    res.sendStatus(400);
+
+                }
+                else {
+                    res.send(rows);
+                }
+
+            })
+
+        }
+
+
+    })
+
+});
 
 // Update Shipment
 
 // Delete Shipment
+app.delete('/delete-shipment', function(req, res, next) {
+    
+    let data = req.body;
+
+    let shipmentID = parseInt(data.shipment_id);
+    
+    let query1 = `DELETE FROM Shipments WHERE shipment_id = ?`;
+    let query2 = `DELETE FROM Orders WHERE shipment_id = ${shipmentID}`
+
+
+    db.pool.query(query2, [shipmentID], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            // Run the second query
+            db.pool.query(query1, [shipmentID], function(error, rows, fields) {
+
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.sendStatus(204);
+                }
+            })
+        }
+})});
 
 //-----------------------------------------------------------------------
 
@@ -321,7 +442,6 @@ app.post('/add-department', function (req, res) {
 
 // Update Department
 
-
 // Delete Department
 app.delete('/delete-department', function(req, res, next) {
 
@@ -362,34 +482,32 @@ app.delete('/delete-department', function(req, res, next) {
 app.get('/items', function (req, res) {
     let query1 = "SELECT * FROM Items";
 
+    // Dropdown
+    let query2 = "SELECT * FROM Departments";
+
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('items', {items: rows});   
+        let items = rows;
 
+        db.pool.query(query2, function(error, rows, fields){
+
+            let departments = rows;
+            res.render('items', {items: items, departments: departments});  
+        })
     })                                                      
 });  
 
-
 // Add Item
-app.post('/add-item-ajax', function(req, res)
-{
-    let data = req.body
+app.post('/add-item', function (req, res) {
 
-    let item_quantity = parseInt(data.itemQuantity);
-    console.log(item_quantity);
-    if (item_quantity === '') {
+    let data = req.body;
 
-        item_quantity = NULL
-
-    }
-
-    query1 = `INSERT INTO Items (item_name, item_price, item_quantity, department_id) VALUES (?, ?, ?, ?)`;
-    db.pool.query(query1, [data.item_name, data.item_price, data.item_quantity, data.department_id],
-        function (error, fields) {
+    query1 = `INSERT INTO Items (item_name, item_price, item_quantity, department_id) VALUES ('${data.itemName}', '${data.itemPrice}', '${data.itemQuantity}', '${data.deptID}')`;
+    db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
 
-            console.log(error)
+            console.log(error);
             res.sendStatus(400);
 
         }
@@ -418,25 +536,36 @@ app.post('/add-item-ajax', function(req, res)
 
 });
 
+
 // Update Item
 
 // Delete Item
+app.delete('/delete-item', function(req, res, next) {
+    
+    let data = req.body;
+
+    let item_id = parseInt(data.item_id);
+    
+    let query1 = `DELETE FROM Items WHERE item_id = ?`;
+
+    db.pool.query(query1, [item_id], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            res.sendStatus(204);
+        }
+})});
 
 
 //-----------------------------------------------------------------------
 
 // Order Items
-
-// Add to OrderItems when Order is created
-
-// When order is updated, add to OrderItems
-
-// When order is deleted, remove OrderItems entry
-
-
-// -----------------------------------------------------------------------
-
-// OrderItems
 app.get('/orderitems', function (req, res) {
     let query1 = "SELECT * FROM OrderItems";
 
@@ -445,9 +574,9 @@ app.get('/orderitems', function (req, res) {
         res.render('orderitems', {orders: rows});   
 
     })                                                      
-}); 
+});
 
-// Add OrderItems
+// Add to OrderItems when Order is created
 app.post('/add-orderitem', function (req, res) {
 
     let data = req.body;
@@ -486,9 +615,10 @@ app.post('/add-orderitem', function (req, res) {
 
 });
 
-// Update OrderItems
+// When order is updated, add to OrderItems
 
-// Delete OrderItems
+// When order is deleted, remove OrderItems entry
+
 
 // -----------------------------------------------------------------------
 
