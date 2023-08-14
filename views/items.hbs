@@ -74,3 +74,32 @@
     <input type="submit">
 </form>
 <script src="./js/add_item.js"></script>
+
+
+<h2>Updating An Item</h2>
+<p>To update an item select if from the drop down then input new price, and/or quantity</p>
+<form id="update-item-form">
+
+    <label for="input-item-update">Item name: </label>
+    <select name="input-item-update" id="input-item-update">
+        <option>Select an Item</option>
+        {{#each items}}
+        <option value="{{this.item_name}}">{{this.item_name}}</option>
+        {{/each}}
+    </select>
+
+    <div class="form-group">
+    <label for="input-itemPrice-update">Item Price: </label>
+    <input type="number" name="input-itemPrice-update" id="input-itemPrice-update">
+    </div>
+
+    <div class="form-group">
+    <label for="input-itemQuant-update">Item Quantity: </label>
+    <input type="number" name="input-itemQuant-update" id="input-itemQuant-update">
+    </div>
+
+    <input type="submit">
+
+</form>
+
+<script src="./js/update_item.js"></script>
