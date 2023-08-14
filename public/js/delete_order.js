@@ -1,9 +1,11 @@
+https://github.com/osu-cs340-ecampus/nodejs-starter-app/tree/main/Step%207%20-%20Dynamically%20Deleting%20Data
+
 function deleteOrder(orderID) {
     // Put our data we want to send in a javascript object
     let data = {
         id: orderID
     };
-    
+
     // Setup our AJAX request
     var xhttp = new XMLHttpRequest();
     xhttp.open("DELETE", "/delete-order", true);
@@ -13,7 +15,7 @@ function deleteOrder(orderID) {
     xhttp.onreadystatechange = () => {
         if (xhttp.readyState == 4 && xhttp.status == 204) {
 
-            // delete data from table
+            // Delete the new data from the table
             deleteRow(orderID);
 
         }
@@ -24,6 +26,7 @@ function deleteOrder(orderID) {
     // Send the request and wait for the response
     xhttp.send(JSON.stringify(data));
 }
+
 
 function deleteRow(orderID){
 
@@ -37,14 +40,3 @@ function deleteRow(orderID){
        }
     }
 }
-
-function deleteDropDownMenu(orderID){
-    let selectMenu = document.getElementById("order-select");
-    for (let i = 0; i < selectMenu.length; i++){
-      if (Number(selectMenu.options[i].value) === Number(orderID)){
-        selectMenu[i].remove();
-        break;
-      } 
-  
-    }
-  }
