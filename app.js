@@ -251,6 +251,11 @@ app.delete('/delete-customer', function(req, res, next) {
     let data = req.body;
 
     let customerID = parseInt(data.customer_id);
+    if (isNaN(customer_id))
+    {
+        customer_id = 'NULL'
+    }
+
     
     let query1 = `DELETE FROM Customers WHERE customer_id = ?`;
     let query2 = `DELETE FROM Orders WHERE customer_id = ?`
@@ -306,6 +311,12 @@ app.post('/add-shipment', function (req, res) {
 
     let data = req.body;
 
+    let shipment_status = parseInt(data.shipment_status);
+    if (isNaN(shipment_status))
+    {
+        shipment_status = 'NULL'
+    }
+
     query1 = `INSERT INTO Shipments (order_id, shipment_date, shipment_status) VALUES ('${data.orderID}', '${data.shipmentDate}', '${data.shipmentStatus}')`;
     db.pool.query(query1, function (error, rows, fields) {
 
@@ -317,7 +328,7 @@ app.post('/add-shipment', function (req, res) {
         }
         else {
 
-            query2 = `SELECT * FROM Shipments;`;
+            query2 = `SELECT * FROM Shipments`;
             db.pool.query(query2, function(error, rows, fields){
 
                 // If there was an error on the second query, send a 400
@@ -343,6 +354,38 @@ app.post('/add-shipment', function (req, res) {
 // Update Shipment
 
 // Delete Shipment
+app.delete('/delete-shipment', function(req, res, next) {
+    
+    let data = req.body;
+
+    let shipmentID = parseInt(data.shipment_id);
+    
+    let query1 = `DELETE FROM Shipments WHERE shipment_id = ?`;
+    let query2 = `DELETE FROM Orders WHERE shipment_id = ${shipmentID}`
+
+
+    db.pool.query(query2, [shipmentID], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            // Run the second query
+            db.pool.query(query1, [shipmentID], function(error, rows, fields) {
+
+                if (error) {
+                    console.log(error);
+                    res.sendStatus(400);
+                } else {
+                    res.sendStatus(204);
+                }
+            })
+        }
+})});
 
 //-----------------------------------------------------------------------
 
@@ -371,25 +414,32 @@ app.get('/departments', function (req, res) {
 app.get('/items', function (req, res) {
     let query1 = "SELECT * FROM Items";
 
+    // Dropdown
+    let query2 = "SELECT * FROM Departments";
+
     db.pool.query(query1, function(error, rows, fields){   
 
-        res.render('items', {items: rows});   
+        let items = rows;
 
+        db.pool.query(query2, function(error, rows, fields){
+
+            let departments = rows;
+            res.render('items', {items: items, departments: departments});  
+        })
     })                                                      
 });  
 
-
 // Add Item
-app.post('/add-item', function(req, res)
-{
-    let data = req.body
+app.post('/add-item', function (req, res) {
+
+    let data = req.body;
 
     query1 = `INSERT INTO Items (item_name, item_price, item_quantity, department_id) VALUES ('${data.itemName}', '${data.itemPrice}', '${data.itemQuantity}', '${data.deptID}')`;
-    db.pool.query(query1, function (error, fields) {
+    db.pool.query(query1, function (error, rows, fields) {
 
         if (error) {
 
-            console.log(error)
+            console.log(error);
             res.sendStatus(400);
 
         }
@@ -422,6 +472,27 @@ app.post('/add-item', function(req, res)
 // Update Item
 
 // Delete Item
+app.delete('/delete-item', function(req, res, next) {
+    
+    let data = req.body;
+
+    let item_id = parseInt(data.item_id);
+    
+    let query1 = `DELETE FROM Items WHERE item_id = ?`;
+
+    db.pool.query(query1, [item_id], function(error, rows, fields){
+        if (error) {
+
+        // Log the error to the terminal so we know what went wrong, and send the visitor an HTTP response 400 indicating it was a bad request.
+        console.log(error);
+        res.sendStatus(400);
+        }
+
+        else
+        {
+            res.sendStatus(204);
+        }
+})});
 
 
 //-----------------------------------------------------------------------
